@@ -1,9 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import LeftPanel from './leftpanel';
+import Sidebar from './sidebar'; // Add this at the top with other imports
+import botIcon from './assets/bot.png';
+import userIcon from './assets/user.png';
+import { Send, Mic,} from 'lucide-react';
 
 export default function App() {
   const [patientData, setPatientData] = useState(null);
@@ -13,6 +18,65 @@ export default function App() {
   const [showUploadPopup, setShowUploadPopup] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [inputMessage, setInputMessage] = useState('');
+  const [docTypeError, setDocTypeError] = useState('');
+  const [appointmentMode, setAppointmentMode] = useState(false);
+  const [appointmentAnswers, setAppointmentAnswers] = useState([]);
+  const [refillReminders, setRefillReminders] = useState([]);
+  const [showStores, setShowStores] = useState(false);
+const [refillMedicineName, setRefillMedicineName] = useState('');
+const [selectedStore, setSelectedStore] = useState(null);
+const [storeMedicines, setStoreMedicines] = useState([]);
+const [showPaymentForm, setShowPaymentForm] = useState(false);
+const [selectedMedicine, setSelectedMedicine] = useState(null);
+const [selectedLocation, setSelectedLocation] = useState('');
+const [isBotTyping, setIsBotTyping] = useState(false); // Loading state
+const uploadRef = useRef(null);
+
+const [prescreeningMode, setPrescreeningMode] = useState(false);
+const [prescreeningAnswers, setPrescreeningAnswers] = useState([]);
+
+
+
+const storeMedicineData = {
+  "HealthPlus Pharmacy": {
+    location: "Downtown",
+    medicines: [
+      { name: "Ibuprofen", price: "$8", description: "Reduces inflammation and pain." },
+      { name: "Amoxicillin", price: "$10", description: "Antibiotic for bacterial infections." },
+    ],
+  },
+  "City Medico": {
+    location: "Suburb",
+    medicines: [
+      { name: "Cough Syrup", price: "$6", description: "Relieves dry cough." },
+      { name: "Vitamin D", price: "$12", description: "Boosts bone health and immunity." },
+      { name: "Paracetamol", price: "$5", description: "Used to treat fever and mild pain." },
+    ],
+  },
+  "GreenLife Drugs": {
+    location: "Uptown",
+    medicines: [
+      { name: "Antacid", price: "$4", description: "Neutralizes stomach acid." },
+      { name: "Paracetamol", price: "$10", description: "Used to treat fever and mild pain." },
+      { name: "Pain Balm", price: "$3", description: "Topical relief for muscle pain." },
+    ],
+  },
+};
+
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (uploadRef.current && !uploadRef.current.contains(event.target)) {
+      setShowUploadPopup(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
+
 
   useEffect(() => {
     const socket = io('http://localhost:5000', {
@@ -22,14 +86,8 @@ export default function App() {
       reconnectionDelay: 2000,
     });
 
-    socket.on('connect', () => {
-      console.log('✅ Connected to Flask WebSocket server');
-    });
-
-    socket.on('disconnect', () => {
-      console.log('🧹 WebSocket connection closed');
-    });
-
+    socket.on('connect', () => console.log('✅ Connected to Flask WebSocket server'));
+    socket.on('disconnect', () => console.log('🧹 WebSocket connection closed'));
     socket.on('message', (data) => {
       setMessages((prev) => {
         if (prev[prev.length - 1].text !== data.data) {
@@ -38,164 +96,377 @@ export default function App() {
         return prev;
       });
     });
+    socket.on('patient_data', (data) => setPatientData(data));
 
-    socket.on('patient_data', (data) => {
-      setPatientData(data);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    return () => socket.disconnect();
   }, []);
 
-  const handleSendMessage = async () => {
-    if (inputMessage.trim()) {
-      setMessages((prev) => [...prev, { sender: 'user', text: inputMessage }]);
+  // ✅ Schedule reminder notifications
+  const scheduleReminderNotifications = (reminders) => {
+    if (!("Notification" in window)) return;
+
+    Notification.requestPermission().then((permission) => {
+      if (permission !== "granted") return;
+
+      reminders.forEach((reminder) => {
+        const time = new Date(reminder.datetime).getTime();
+        const delay = time - Date.now();
+
+        if (delay > 0) {
+          setTimeout(() => {
+            new Notification("💊 Medicine Reminder", {
+              body: `Time to take ${reminder.medicine}`,
+              icon: '/pill.png', // optional icon in public/
+            });
+          }, delay);
+        }
+      });
+    });
+  };
+  const scheduleRefillNotifications = (refillReminders) => {
+    if (!("Notification" in window)) return;
+
+    refillReminders.forEach((reminder) => {
+      const time = new Date(reminder.refill_date).getTime();
+      const delay = time - Date.now();
+
+      if (delay > 0) {
+        setTimeout(() => {
+          new Notification("🛒 Refill Reminder", {
+            body: `Time to refill ${reminder.medicine}`,
+            icon: '/refill.png',
+          });
+        }, delay);
+      }
+    });
+  };
+  const handleStoreClick = (storeName) => {
+    setSelectedStore(storeName);
+    const store = storeMedicineData[storeName];
+    const matchedMeds = store?.medicines.filter(
+      (med) => med.name.toLowerCase() === refillMedicineName.toLowerCase()
+    ) || [];
+    setStoreMedicines(matchedMeds);
+};
+
+  
+  
+  const handleMedicineClick = (medicine) => {
+    setSelectedMedicine(medicine);
+    setShowPaymentForm(true);
+  };
+  
+  
+  const handleSendMessage = async (message = inputMessage, addUserMessage = true) => {
+    setIsBotTyping(true); 
+    if (selectedFile && !docType) {
+      setDocTypeError('⚠️ Please select a document type');
+      return;
+    } else {
+      setDocTypeError('');
     }
 
-    try {
-      if (selectedFile) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: 'user',
-            text: `📎 Uploaded: ${selectedFile.name} (${docType || 'Unknown Type'})`,
-          },
-        ]);
+    const isAppointmentRequest = /appointment/i.test(message);
 
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('question', inputMessage || 'Please analyze this document.');
-        formData.append('docType', docType); 
+    if (selectedFile) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: 'user',
+          text: `📎 Uploaded: ${selectedFile.name} (${docType || 'Unknown Type'})`,
+        },
+      ]);
 
-        const res = await axios.post('http://localhost:5000/ask-question', formData, {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('question', message || 'Please analyze this document.');
+      formData.append('docType', docType);
+
+      let url = 'http://localhost:5000/ask-question';
+      if (docType === 'Prescription') url = 'http://localhost:5000/prescription';
+      if (isAppointmentRequest) url = 'http://localhost:5000/appointment';
+      
+
+      try {
+        const res = await axios.post(url, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
-        const paragraphs = res.data.response.split(/\n\s*\n/);
+        if (docType === 'Prescription' && res.data.data) {
+          const meds = res.data.data;
+          const reminders = res.data.scheduled_reminders;
+          const refillReminders = res.data.refill_reminders || [];
+          if (reminders?.length) {
+            scheduleReminderNotifications(reminders);
+          }
+          
+          if (refillReminders.length) {
+            scheduleRefillNotifications(refillReminders);
+          }
 
-        setMessages((prev) => [
-          ...prev,
-          ...paragraphs.map((para) => ({
-            sender: 'bot',
-            text: para.replace(/^[-*\d.]+\s*/, '').trim(),
-          })),
-        ]);
+
+          const reminderText = meds.map((item) => {
+            return `*${item.medicine}*\n🕒 Time: ${item.time.join(', ')}\n🍽️ Meal: ${item.meal || 'N/A'}\n📅 Days: ${item.days}`;
+          }).join('\n\n');
+
+          
+          const refillText = refillReminders.map((item) => {
+            const refillTime = new Date(item.refill_date).toLocaleString();
+            return `🛒 *${item.medicine}* refill reminder at ${refillTime}`;
+          }).join('\n');
+          
+          const combinedText = `✅ Medicine reminders set:\n\n${reminderText}${refillText ? '\n\n' + refillText : ''}`;
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: 'bot',
+              text: combinedText,
+            },
+          ]);
+        } else {
+          const paragraphs = res.data.response.split(/\n\s*\n/);
+          setMessages((prev) => [
+            ...prev,
+            ...paragraphs.map((para) => ({
+              sender: 'bot',
+              text: para.replace(/^[-*\d.]+\s*/, '').trim(),
+            })),
+          ]);
+        }
 
         setSelectedFile(null);
         setDocType('');
         setShowUploadPopup(false);
-      } else if (inputMessage.trim()) {
-        const res = await axios.post('http://localhost:5000/chat', {
-          question: inputMessage,
-        });
+      } catch (err) {
+        console.error('❌ Error:', err);
+        setMessages((prev) => [...prev, { sender: 'bot', text: '❌ Upload failed.' }]);
+      }
+    } else if (message.trim()) {
+      if (addUserMessage) {
+        setMessages((prev) => [...prev, { sender: 'user', text: message }]);
+      }
 
+      let res;
+
+      try {
+        if (isAppointmentRequest && !appointmentMode) {
+          setAppointmentMode(true);
+          setAppointmentAnswers([]);
+          res = await axios.post('http://localhost:5000/appointment', { answers: [] });
+        } else if (appointmentMode) {
+          const updatedAnswers = [...appointmentAnswers, message];
+          setAppointmentAnswers(updatedAnswers);
+          res = await axios.post('http://localhost:5000/appointment', { answers: updatedAnswers });
+
+          if (res.data.response.includes('Appointment confirmed')) {
+            setAppointmentMode(false);
+            setAppointmentAnswers([]);
+          }
+        } else if (/prescreen/i.test(message) && !prescreeningMode) {
+          setPrescreeningMode(true);
+          setPrescreeningAnswers([]);
+          res = await axios.post('http://localhost:5000/prescreening', { answers: [] });
+        } else if (prescreeningMode) {
+          const updatedAnswers = [...prescreeningAnswers, message];
+          setPrescreeningAnswers(updatedAnswers);
+          res = await axios.post('http://localhost:5000/prescreening', { answers: updatedAnswers });
+        
+          if (res.data.response.includes("Prescreening completed") && res.data.file_url) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                sender: 'bot',
+                text: `Prescreening completed. [📄 Click here to download PDF](${res.data.file_url})`,
+              },
+            ]);
+            setPrescreeningMode(false); // ✅ Exit prescreening mode
+            return;
+          }
+          
+        
+        } else {
+          res = await axios.post('http://localhost:5000/chat', { question: message });
+        }
+        
         setMessages((prev) => [
           ...prev,
-          { sender: 'bot', text: res.data.response },
+          {
+            sender: 'bot',
+            text: res.data.response,
+            options: res.data.options || null,
+          },
         ]);
+      } catch (err) {
+        console.error('❌ Error:', err);
+        setMessages((prev) => [...prev, { sender: 'bot', text: '❌ Something went wrong.' }]);
       }
-    } catch (err) {
-      console.error('❌ Error sending message:', err);
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'bot', text: '❌ Something went wrong.' },
-      ]);
+      finally {
+        setIsBotTyping(false); // Hide typing dots animation after response
+      }
     }
-
+    setIsBotTyping(false);
     setInputMessage('');
+  };
+
+  const handleOptionClick = async (option) => {
+    setMessages((prev) => [...prev, { sender: 'user', text: option }]);
+    setInputMessage(option);
+    await handleSendMessage(option, false);
   };
 
   return (
     <div className="app">
-      <div className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
-        <button className="toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          {sidebarOpen ? '←' : '→'}
-        </button>
-        {sidebarOpen && (
-          <ul>
-            <div>🏠</div>
-            <div>📁</div>
-            <div>📊</div>
-            <div>⚙️</div>
-          </ul>
-        )}
-      </div>
+     
+     
 
-      <div className="left-panel">
-        <h2>🩺 HealthApp</h2><br />
-        <h3>Patient Data</h3>
-        <div className="data-box">
-          {patientData ? (
-            <>
-              <div className="data-item"><p>🛌 Sleep: {patientData.sleep_hours}h</p></div>
-              <div className="data-item"><p>❤️ HR: {patientData.heart_rate} bpm</p></div>
-              <div className="data-item"><p>💉 BP: {patientData.bp_systolic}/{patientData.bp_diastolic} mmHg</p></div>
-              <div className="data-item"><p>💓 Heart: {patientData.heart_rate} bpm</p></div>
-            </>
-          ) : (
-            <p>⏳ Waiting for data...</p>
-          )}
-        </div>
 
-        <h3>Upload History</h3>
-        <ul className="history-list">
-          <li>📄 bill.pdf <span>Just now</span></li>
-          <li>📄 prescription.pdf <span>Yesterday</span></li>
-          <li>📄 report.pdf <span>1 week ago</span></li>
-        </ul>
-      </div>
+<Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+
+      <LeftPanel 
+        patientData={patientData}
+        refillReminders={refillReminders}
+        showStores={showStores}
+        setShowStores={setShowStores}
+        refillMedicineName={refillMedicineName}
+        setRefillMedicineName={setRefillMedicineName}
+        setSelectedLocation={setSelectedLocation}
+        storeMedicineData={storeMedicineData}
+        selectedStore={selectedStore}
+        setSelectedStore={setSelectedStore}
+        handleStoreClick={handleStoreClick}
+        storeMedicines={storeMedicines}
+        showPaymentForm={showPaymentForm}
+        selectedMedicine={selectedMedicine}
+        setShowPaymentForm={setShowPaymentForm}
+        selectedLocation={selectedLocation}
+        handleMedicineClick={handleMedicineClick}
+      />
+
+     
 
       <div className="right-panel">
-        <h2>Chat</h2>
+        <div className="header-bar">
+  <h2>Medchat</h2>
+  <button className="prescreen-btn" onClick={() => handleSendMessage('prescreening')}>
+    Start Prescreening
+  </button>
+</div>
+
+
         <div className="chat-area">
-          {messages.map((msg, i) => (
-            <div key={i} className={msg.sender === 'user' ? 'user-msg' : 'bot-msg'}>
+  {messages.map((msg, i) => (
+    <div key={i} className={msg.sender === 'user' ? 'user-msg' : 'bot-msg'}>
+      <div className="chat-line">
+        <div className="chat-icon">
+          <img src={msg.sender === 'user' ? userIcon : botIcon} alt="icon" />
+        </div>
+        <div className="chat-bubble">
+          {msg.text.startsWith('📎 Uploaded:') ? (
+            <div className="upload-chat-bubble">
+              <div className="file-icon">📄</div>
+              <div className="file-details">
+                <div className="file-name">{msg.text.split(':')[1].split('(')[0].trim()}</div>
+                <div className="file-type">{msg.text.match(/\((.*?)\)/)?.[1]}</div>
+              </div>
+            </div>
+          ) : (
+            <>
               <ReactMarkdown
                 components={{
                   p: ({ node, ...props }) => <p style={{ margin: '8px 0' }} {...props} />,
                   li: ({ node, ...props }) => <p style={{ margin: '8px 0' }} {...props} />,
                 }}
               >
-                {msg.text.replace(/^[-*\d.]+\s*/gm, '')}
+                {msg.text.replace(/^\s*[-*]\s+/gm, '')}
               </ReactMarkdown>
-            </div>
-          ))}
+
+              {msg.options && (
+                <div className="option-buttons">
+                  {msg.options.map((option, index) => (
+                    <button
+                      key={index}
+                      className="option-btn"
+                      onClick={() => handleOptionClick(option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
+      </div>
+    </div>
+  ))}
+
+  {/* Loading Indicator (Dot Animation) */}
+  {isBotTyping && (
+    <div className="bot-msg">
+      <div className="chat-line">
+        <div className="chat-icon">
+          <img src={botIcon} alt="bot typing" />
+        </div>
+        <div className="chat-bubble">
+          <div className="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
 
         <div className="input-area">
           <div className="upload-dropdown-wrapper">
             <button className="plus-btn" onClick={() => setShowUploadPopup(!showUploadPopup)}>+</button>
             {showUploadPopup && (
-              <div className="upload-popup">
+            <div className="upload-popup" ref={uploadRef}>
                 <label className="upload-label">
                   📎 Upload File
                   <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
                 </label>
-                <select className="doc-select" onChange={(e) => setDocType(e.target.value)} value={docType}>
+                <select className="doc-select" onChange={(e) => { setDocType(e.target.value); setDocTypeError(''); }} value={docType}>
                   <option value="">Select Type</option>
                   <option value="Bill">Bill</option>
                   <option value="Prescription">Prescription</option>
                   <option value="Photo">Photo</option>
                 </select>
+                {docTypeError && (
+                  <span style={{ color: 'red', fontSize: '0.8rem', marginTop: '4px' }}>
+                    {docTypeError}
+                  </span>
+                )}
               </div>
             )}
           </div>
 
           <input
-            type="text"
-            placeholder="Type a message..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-          />
+  type="text"
+  placeholder="Type a message..."
+  value={inputMessage}
+  onChange={(e) => setInputMessage(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' && inputMessage.trim()) {
+      e.preventDefault(); // Prevent the Enter key from adding a new line
+      handleSendMessage(); // Call the send message function
+    }
+  }}
+/>
+
 
           {(inputMessage.trim() || selectedFile) ? (
-            <button className="mic-btn" onClick={handleSendMessage}>📤</button>
+            <button className="mic-btn" onClick={() => handleSendMessage()}><Send size={20} color="#fff" /> </button>
           ) : (
-            <button className="mic-btn">🎤</button>
+            <button className="mic-btn">  <Mic size={20} color="#fff" /> </button>
           )}
         </div>
       </div>
     </div>
   );
 }
+ 

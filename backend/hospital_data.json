@@ -1,0 +1,92 @@
+{
+    "places": {
+      "New York": {
+        "City Hospital": {
+          "Cardiology": {
+            "Dr. Smith": ["9:00 AM", "11:00 AM", "3:00 PM"],
+            "Dr. Lee": ["10:00 AM", "2:00 PM"]
+          },
+          "Neurology": {
+            "Dr. Grey": ["10:00 AM", "2:00 PM"],
+            "Dr. Watson": ["8:30 AM", "1:30 PM"]
+          }
+        },
+        "Downtown Clinic": {
+          "Dermatology": {
+            "Dr. Ray": ["12:00 PM", "4:00 PM"],
+            "Dr. Taylor": ["9:30 AM", "3:00 PM"]
+          },
+          "Orthopedics": {
+            "Dr. Jones": ["11:00 AM", "2:30 PM"]
+          }
+        }
+      },
+      "Chicago": {
+        "Lakeside Medical": {
+          "Orthopedics": {
+            "Dr. Kent": ["10:30 AM", "1:30 PM"],
+            "Dr. Harris": ["9:00 AM", "3:30 PM"]
+          }
+        },
+        "Union Health": {
+          "Cardiology": {
+            "Dr. Grant": ["8:00 AM", "12:00 PM", "4:00 PM"]
+          }
+        }
+      },
+      "Los Angeles": {
+        "Sunset Hospital": {
+          "Dermatology": {
+            "Dr. Black": ["9:00 AM", "1:00 PM", "5:00 PM"]
+          },
+          "Pediatrics": {
+            "Dr. Davis": ["10:00 AM", "2:00 PM"]
+          }
+        },
+        "Skyline Medical": {
+          "Neurology": {
+            "Dr. Hill": ["9:30 AM", "3:30 PM"],
+            "Dr. Green": ["8:00 AM", "12:00 PM"]
+          }
+        }
+      },
+      "San Francisco": {
+        "Bay Area Hospital": {
+          "Orthopedics": {
+            "Dr. Clark": ["10:00 AM", "2:00 PM", "4:30 PM"]
+          },
+          "Dermatology": {
+            "Dr. Smith": ["9:30 AM", "1:30 PM"]
+          }
+        },
+        "Golden Gate Clinic": {
+          "Cardiology": {
+            "Dr. Morgan": ["9:00 AM", "3:00 PM"]
+          },
+          "Gastroenterology": {
+            "Dr. Harris": ["11:00 AM", "2:30 PM"]
+          }
+        }
+      },
+      "Miami": {
+        "Oceanic Medical Center": {
+          "Neurology": {
+            "Dr. Young": ["8:30 AM", "2:00 PM"],
+            "Dr. White": ["10:00 AM", "4:30 PM"]
+          },
+          "Cardiology": {
+            "Dr. Black": ["9:30 AM", "12:30 PM"]
+          }
+        },
+        "Sunshine Health": {
+          "Orthopedics": {
+            "Dr. Lopez": ["10:00 AM", "1:30 PM"]
+          },
+          "Pediatrics": {
+            "Dr. Oliver": ["9:00 AM", "3:00 PM"]
+          }
+        }
+      }
+    }
+  }
+  
