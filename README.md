@@ -18,6 +18,7 @@
 - Health Chat — Provides accurate, structured responses for symptoms, treatment, and lab advice.
 - Real-Time Patient Monitoring — Simulates vital signs (heart rate, BP) and streams data to clients.
 
+##  Demo video link : Demo-video/Demo video - HealthBrain.zip at tony-ust-patch-1 · UST-CIS-GenAI/Demo-video
 
 ##  Installation
 
