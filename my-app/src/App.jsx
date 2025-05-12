@@ -31,37 +31,25 @@ const [selectedMedicine, setSelectedMedicine] = useState(null);
 const [selectedLocation, setSelectedLocation] = useState('');
 const [isBotTyping, setIsBotTyping] = useState(false); // Loading state
 const uploadRef = useRef(null);
+const [storeMedicineData, setStoreMedicineData] = useState({});
+
 
 const [prescreeningMode, setPrescreeningMode] = useState(false);
 const [prescreeningAnswers, setPrescreeningAnswers] = useState([]);
 
 
+useEffect(() => {
+  const fetchStores = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/stores');
+      setStoreMedicineData(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch store data:", err);
+    }
+  };
 
-const storeMedicineData = {
-  "HealthPlus Pharmacy": {
-    location: "Downtown",
-    medicines: [
-      { name: "Ibuprofen", price: "$8", description: "Reduces inflammation and pain." },
-      { name: "Amoxicillin", price: "$10", description: "Antibiotic for bacterial infections." },
-    ],
-  },
-  "City Medico": {
-    location: "Suburb",
-    medicines: [
-      { name: "Cough Syrup", price: "$6", description: "Relieves dry cough." },
-      { name: "Vitamin D", price: "$12", description: "Boosts bone health and immunity." },
-      { name: "Paracetamol", price: "$5", description: "Used to treat fever and mild pain." },
-    ],
-  },
-  "GreenLife Drugs": {
-    location: "Uptown",
-    medicines: [
-      { name: "Antacid", price: "$4", description: "Neutralizes stomach acid." },
-      { name: "Paracetamol", price: "$10", description: "Used to treat fever and mild pain." },
-      { name: "Pain Balm", price: "$3", description: "Topical relief for muscle pain." },
-    ],
-  },
-};
+  fetchStores();
+}, []);
 
 
 useEffect(() => {

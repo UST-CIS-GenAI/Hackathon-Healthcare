@@ -8,6 +8,7 @@ from flask import Flask, request, jsonify,send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from dotenv import load_dotenv
+import csv
 import openai
 import json
 import threading
@@ -231,106 +232,106 @@ def ask_question():
 # # Dummy prescription data for testing purpose
 
 
-@app.route('/prescription', methods=['POST'])
-def prescription_route():
-    print("🚨 Request received at /prescription")
+# @app.route('/prescription', methods=['POST'])
+# def prescription_route():
+#     print("🚨 Request received at /prescription")
 
-    # Dummy prescription data (update as needed for test)
-    dummy_data = [
-        {'medicine': 'Naprosyn', 'time': ['10:04 AM', '04:01 PM'], 'meal': 'after meal', 'days': 1},
-        {'medicine': 'Beklo', 'time': ['10:05 AM', '04:03 PM'], 'meal': 'after meal', 'days': 5},
-        {'medicine': 'Neocepin-R', 'time': ['10:06 AM', '08:00 PM'], 'meal': 'before meal', 'days': 15},
-        {'medicine': 'Ace', 'time': ['08:00 AM', '12:00 PM', '08:00 PM'], 'meal': 'after meal', 'days': 2},
-        {'medicine': 'Calbo D', 'time': ['08:00 PM'], 'meal': 'after meal', 'days': 'Cont.'},
-        {'medicine': 'Avolac', 'time': ['08:00 AM', '12:00 PM', '08:00 PM'], 'meal': 'after meal', 'days': 'as needed for constipation'}
-    ]
+#     # Dummy prescription data (update as needed for test)
+#     dummy_data = [
+#         {'medicine': 'Naprosyn', 'time': ['10:04 AM', '04:01 PM'], 'meal': 'after meal', 'days': 1},
+#         {'medicine': 'Beklo', 'time': ['10:05 AM', '04:03 PM'], 'meal': 'after meal', 'days': 5},
+#         {'medicine': 'Neocepin-R', 'time': ['10:06 AM', '08:00 PM'], 'meal': 'before meal', 'days': 15},
+#         {'medicine': 'Ace', 'time': ['08:00 AM', '12:00 PM', '08:00 PM'], 'meal': 'after meal', 'days': 2},
+#         {'medicine': 'Calbo D', 'time': ['08:00 PM'], 'meal': 'after meal', 'days': 'Cont.'},
+#         {'medicine': 'Avolac', 'time': ['08:00 AM', '12:00 PM', '08:00 PM'], 'meal': 'after meal', 'days': 'as needed for constipation'}
+#     ]
 
-    try:
-        # Set the start date for testing (example: 5/8/2025)
-        start_date = datetime(2025, 5, 8, 0, 0, 0)  # May 8th, 2025 at midnight
-        scheduled_reminders = []
-        refill_reminders = []
+#     try:
+#         # Set the start date for testing (example: 5/8/2025)
+#         start_date = datetime(2025, 5, 8, 0, 0, 0)  # May 8th, 2025 at midnight
+#         scheduled_reminders = []
+#         refill_reminders = []
 
-        # Iterate through dummy data for each medicine
-        for item in dummy_data:
-            reminder_id = str(uuid.uuid4())
-            medicine = item['medicine']
-            time_list = item['time']
-            raw_days = item.get('days', 3)
+#         # Iterate through dummy data for each medicine
+#         for item in dummy_data:
+#             reminder_id = str(uuid.uuid4())
+#             medicine = item['medicine']
+#             time_list = item['time']
+#             raw_days = item.get('days', 3)
 
-            try:
-                days = int(raw_days)
-                is_numeric_days = True
-            except (ValueError, TypeError):
-                days = 3  # fallback for 'Cont.' or similar
-                is_numeric_days = False
+#             try:
+#                 days = int(raw_days)
+#                 is_numeric_days = True
+#             except (ValueError, TypeError):
+#                 days = 3  # fallback for 'Cont.' or similar
+#                 is_numeric_days = False
 
-            for time_str in time_list:
-                try:
-                    time_obj = datetime.strptime(time_str.strip(), "%I:%M %p")
-                except ValueError:
-                    print(f"⚠️ Skipping invalid time: {time_str}")
-                    continue
+#             for time_str in time_list:
+#                 try:
+#                     time_obj = datetime.strptime(time_str.strip(), "%I:%M %p")
+#                 except ValueError:
+#                     print(f"⚠️ Skipping invalid time: {time_str}")
+#                     continue
 
-                for i in range(days):
-                    scheduled_time = (start_date + timedelta(days=i)).replace(
-                        hour=time_obj.hour, minute=time_obj.minute, second=0, microsecond=0
-                    )
+#                 for i in range(days):
+#                     scheduled_time = (start_date + timedelta(days=i)).replace(
+#                         hour=time_obj.hour, minute=time_obj.minute, second=0, microsecond=0
+#                     )
 
-                    scheduled_reminders.append({
-                        "medicine": medicine,
-                        "datetime": scheduled_time.isoformat()
-                    })
+#                     scheduled_reminders.append({
+#                         "medicine": medicine,
+#                         "datetime": scheduled_time.isoformat()
+#                     })
 
-                    # Define reminder function
-                    def send_reminder(med=medicine):
-                        print(f"⏰ Reminder: Time to take {med}!")
+#                     # Define reminder function
+#                     def send_reminder(med=medicine):
+#                         print(f"⏰ Reminder: Time to take {med}!")
 
-                    # Schedule reminder for each medicine
-                    scheduler.add_job(
-                        send_reminder,
-                        'date',
-                        run_date=scheduled_time,
-                        id=f"{reminder_id}_{i}_{time_str}",
-                        replace_existing=True
-                    )
+#                     # Schedule reminder for each medicine
+#                     scheduler.add_job(
+#                         send_reminder,
+#                         'date',
+#                         run_date=scheduled_time,
+#                         id=f"{reminder_id}_{i}_{time_str}",
+#                         replace_existing=True
+#                     )
 
-                # ✅ Schedule refill reminder 2 days before the last dose (for numeric durations)
-                if is_numeric_days and days > 2:
-                    refill_day = days - 2  # Subtract 2 to schedule refill reminder 2 days before last dose
-                    refill_time = (start_date + timedelta(days=refill_day)).replace(
-                        hour=23, minute=0, second=0, microsecond=0  # Set refill time to 11:00 PM
-                    )
+#                 # ✅ Schedule refill reminder 2 days before the last dose (for numeric durations)
+#                 if is_numeric_days and days > 2:
+#                     refill_day = days - 2  # Subtract 2 to schedule refill reminder 2 days before last dose
+#                     refill_time = (start_date + timedelta(days=refill_day)).replace(
+#                         hour=23, minute=0, second=0, microsecond=0  # Set refill time to 11:00 PM
+#                     )
 
-                    # Define refill reminder function
-                    def send_refill_reminder(med=medicine):
-                        print(f"🔔 Refill reminder for {med}")
+#                     # Define refill reminder function
+#                     def send_refill_reminder(med=medicine):
+#                         print(f"🔔 Refill reminder for {med}")
 
-                    # Schedule refill reminder
-                    scheduler.add_job(
-                        send_refill_reminder,
-                        'date',
-                        run_date=refill_time,
-                        id=f"refill_{reminder_id}",
-                        replace_existing=True
-                    )
+#                     # Schedule refill reminder
+#                     scheduler.add_job(
+#                         send_refill_reminder,
+#                         'date',
+#                         run_date=refill_time,
+#                         id=f"refill_{reminder_id}",
+#                         replace_existing=True
+#                     )
 
-                    # Add refill reminder info to the list to send to the frontend
-                    refill_reminders.append({
-                        "medicine": medicine,
-                        "refill_date": refill_time.isoformat()
-                    })
+#                     # Add refill reminder info to the list to send to the frontend
+#                     refill_reminders.append({
+#                         "medicine": medicine,
+#                         "refill_date": refill_time.isoformat()
+#                     })
 
-        return jsonify({
-            "message": "Reminders scheduled",
-            "data": dummy_data,
-            "scheduled_reminders": scheduled_reminders,
-            "refill_reminders": refill_reminders
-        })
+#         return jsonify({
+#             "message": "Reminders scheduled",
+#             "data": dummy_data,
+#             "scheduled_reminders": scheduled_reminders,
+#             "refill_reminders": refill_reminders
+#         })
 
-    except Exception as e:
-        print(f"❌ Error occurred: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         print(f"❌ Error occurred: {str(e)}")
+#         return jsonify({"error": str(e)}), 500
 
 
 
@@ -428,6 +429,193 @@ def prescription_route():
 #         return jsonify({"error": str(e)}), 500
 
 
+
+# Flask backend
+
+
+@app.route('/stores', methods=['GET'])
+def get_stores():
+    store_data = {}
+
+    with open('store_data.csv', newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            store = row['store']
+            location = row['location']
+            medicine = {
+                'name': row['medicine'],
+                'price': row['price'],
+                'description': row['description']
+            }
+
+            if store not in store_data:
+                store_data[store] = {
+                    'location': location,
+                    'medicines': [medicine]
+                }
+            else:
+                store_data[store]['medicines'].append(medicine)
+
+    return jsonify(store_data)
+# @app.route('/stores', methods=['GET'])
+# def get_stores():
+#     store_data = {
+#         "HealthPlus Pharmacy": {
+#             "location": "Downtown",
+#             "medicines": [
+#                 {"name": "Ibuprofen", "price": "$8", "description": "Reduces inflammation and pain."},
+#                 {"name": "Amoxicillin", "price": "$10", "description": "Antibiotic for bacterial infections."}
+#             ]
+#         },
+#         "City Medico": {
+#             "location": "Suburb",
+#             "medicines": [
+#                 {"name": "Cough Syrup", "price": "$6", "description": "Relieves dry cough."},
+#                 {"name": "Vitamin D", "price": "$12", "description": "Boosts bone health and immunity."},
+#                 {"name": "Paracetamol", "price": "$5", "description": "Used to treat fever and mild pain."}
+#             ]
+#         },
+#         "GreenLife Drugs": {
+#             "location": "Uptown",
+#             "medicines": [
+#                 {"name": "Antacid", "price": "$4", "description": "Neutralizes stomach acid."},
+#                 {"name": "Paracetamol", "price": "$10", "description": "Used to treat fever and mild pain."},
+#                 {"name": "Pain Balm", "price": "$3", "description": "Topical relief for muscle pain."}
+#             ]
+#         }
+#     }
+
+#     return jsonify(store_data)
+
+
+@app.route('/prescription', methods=['POST'])
+def prescription_route():
+    print("🚨 Request received at /prescription")
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "File is required"}), 400
+
+    file = request.files['file']
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(file_path)
+
+    try:
+        with open(file_path, "rb") as f:
+            image_bytes = f.read()
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+
+        prompt = (
+            "This is a medical prescription. Extract all medicine names, all intake timings (in HH:MM AM/PM format), "
+            "whether they should be taken before or after meals, and how many days each medicine must be taken. "
+            "Return a list in this format:\n"
+            "[{'medicine': 'Paracetamol', 'time': ['08:00 AM', '08:00 PM'], 'meal': 'after meal', 'days': 5}]"
+        )
+
+        # OpenAI Vision API call
+        response = openai.ChatCompletion.create(
+            engine=DEPLOYMENT_NAME,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
+                ]}
+            ],
+            max_tokens=800,
+            temperature=0.4
+        )
+
+        content = response['choices'][0]['message']['content']
+        print("🧪 [DEBUG] OpenAI response:")
+        print(content)
+
+        # Try to parse the JSON output from OpenAI
+        try:
+            meds_data = json.loads(content)
+        except json.JSONDecodeError:
+            match = re.search(r"\[.*\]", content, re.DOTALL)
+            if match:
+                json_like = match.group(0).replace("'", '"')
+                meds_data = json.loads(json_like)
+            else:
+                raise ValueError("Could not extract valid JSON from response.")
+
+        # ✅ Schedule reminders
+        start_date = datetime.now()
+        scheduled_reminders = []
+        refill_reminders = []
+
+        for item in meds_data:
+            reminder_id = str(uuid.uuid4())
+            medicine = item['medicine']
+            time_list = item['time']
+            raw_days = item.get('days', 3)
+
+            try:
+                days = int(raw_days)
+                is_numeric_days = True
+            except (ValueError, TypeError):
+                days = 3  # fallback for 'Cont.' or 'as needed'
+                is_numeric_days = False
+
+            for time_str in time_list:
+                try:
+                    time_obj = datetime.strptime(time_str.strip(), "%I:%M %p")
+                except ValueError:
+                    print(f"⚠️ Skipping invalid time: {time_str}")
+                    continue
+
+                for i in range(days):
+                    scheduled_time = (start_date + timedelta(days=i)).replace(
+                        hour=time_obj.hour, minute=time_obj.minute, second=0)
+
+                    scheduled_reminders.append({
+                        "medicine": medicine,
+                        "datetime": scheduled_time.isoformat()
+                    })
+
+                    def send_reminder(med=medicine):
+                        print(f"⏰ Reminder: Time to take {med}!")
+
+                    scheduler.add_job(
+                        send_reminder,
+                        'date',
+                        run_date=scheduled_time,
+                        id=f"{reminder_id}_{i}_{time_str}",
+                        replace_existing=True
+                    )
+
+            if is_numeric_days and days > 2:
+                refill_day = days - 2
+                refill_time = (start_date + timedelta(days=refill_day)).replace(
+                    hour=23, minute=0, second=0)
+
+                def send_refill_reminder(med=medicine):
+                    print(f"🔔 Refill reminder for {med}")
+
+                scheduler.add_job(
+                    send_refill_reminder,
+                    'date',
+                    run_date=refill_time,
+                    id=f"refill_{reminder_id}",
+                    replace_existing=True
+                )
+
+                refill_reminders.append({
+                    "medicine": medicine,
+                    "refill_date": refill_time.isoformat()
+                })
+
+        return jsonify({
+            "message": "Reminders scheduled from image prescription",
+            "data": meds_data,
+            "scheduled_reminders": scheduled_reminders,
+            "refill_reminders": refill_reminders
+        })
+
+    except Exception as e:
+        print(f"❌ Error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/prescreening', methods=['POST'])
@@ -641,3 +829,4 @@ socketio.start_background_task(send_patient_data)
 # Run the server
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
+   
