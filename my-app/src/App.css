@@ -80,18 +80,14 @@
   margin-bottom: 10px;
 }
 
-.left-panel h3,
-.left-panel h2,
 .left-panel .data-box,
 .left-panel .history-list {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
-
-
 
 .data-box {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 15px;
 }
 
@@ -129,10 +125,38 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  margin-top: 50px; /* Adjust the value as needed */
 }
 
+/* Base style for all chat bubbles */
 .chat-bubble {
   max-width: 80%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  border-radius: 18px 18px 18px 6px; /* Slight tail-like shape */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: #f0efef69;
+  position: relative;
+  display: inline-block;
+}
+
+/* Bot message styling */
+.bot-msg {
+  color: #333;
+  align-self: flex-start;
+  border-radius: 18px 18px 18px 6px;
+}
+
+/* User message styling */
+.user-msg {
+  color: #333;
+  align-self: flex-end;
+  border-radius: 18px 18px 6px 18px;
 }
 
 /* Right panel for chat area and input */
@@ -151,10 +175,9 @@
   margin-right: 20px;
 }
 h2 {
-  border-left: 4px solid rgba(82, 158, 158, 0.295);
+  border-left: 4px solid rgba(165, 181, 181, 0.295);
   padding-left: 10px;
   color: #080631bd; /* Set font color */
-  text-shadow: 2px 2px 5px rgba(16, 15, 15, 0.174); /* Add shadow to text */
 }
 
 .chat-area {
@@ -166,31 +189,6 @@ h2 {
   padding-right: 10px;
   max-height: 100%;
 }
-
-.bot-msg,
-.user-msg {
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin: 5px 0;
-  max-width: 70%;
-  font-size: 14px;
-  line-height: 1.5;
-  word-break: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-.bot-msg {
-  background: #f1f1f1;
-  align-self: flex-start;
-}
-
-.user-msg {
-  background: #f1f1f1;
- 
-  align-self: flex-end;
-}
-
 
 .bot-icon img,
 .user-icon img {
@@ -239,7 +237,7 @@ h2 {
   border-radius: 8px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 999;
-  width: 220px;
+  width: 110px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -292,7 +290,7 @@ h2 {
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  max-width: 70%;
+  max-width: 50%;
   word-break: break-word;
 }
 
@@ -341,11 +339,18 @@ h2 {
   align-items: center;
   margin-bottom: 12px;
 }
+.prescreen-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Adjusts spacing between buttons */
+  align-items: flex-start; /* Aligns buttons to the start of the container */
+  margin-bottom: 1rem; /* Adds space below the button group */
+}
 
 .prescreen-btn {
   padding: 4px 10px;
   font-size: 12px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 6px;
@@ -356,9 +361,36 @@ h2 {
 .prescreen-btn:hover {
   background-color: #45a049;
 }
+.tooltip-container {
+  position: relative; /* To position the tooltip relative to this container */
+  display: inline-block; /* So that it takes up the space of the text or icon */
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.345);
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position the tooltip above the element */
+  left: 50%;
+  margin-left: -20px; /* Offset to center the tooltip */
+  opacity: 0; /* Initially hidden */
+  transition: opacity 0.3s; /* Smooth transition for visibility */
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1; /* Show tooltip when hovered */
+}
 
 @keyframes typing {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
   }
   50% {
@@ -419,25 +451,24 @@ h2 {
     border-radius: 8px;
     margin-bottom: 10px;
   }
-  
+
   .file-icon {
     font-size: 1.5rem;
     margin-right: 12px;
   }
-  
+
   .file-details {
     display: flex;
     flex-direction: column;
   }
-  
+
   .file-name {
     font-weight: bold;
     color: #333;
   }
-  
+
   .file-type {
     font-size: 0.85rem;
     color: #555;
   }
-  
 }

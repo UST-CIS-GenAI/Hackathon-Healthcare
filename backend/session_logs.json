@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": "2025-05-16T16:35:41.674459",
+    "questions": [
+      "Have you experienced any recent changes in your vision, such as blurriness or double vision, along with the dizziness?",
+      "Are you experiencing any other symptoms, such as nausea, headache, or ringing in the ears, in addition to feeling dizzy?",
+      "How long have you been experiencing dizziness, and does it occur at specific times or under certain conditions?",
+      "Have you had any recent injuries, particularly to the head, or any falls that might be related to your dizziness?",
+      "Are you currently taking any medications or supplements, and if so, have there been any recent changes in your dosage or new medications added?"
+    ],
+    "answers": [
+      "i feel dizzy",
+      "no",
+      "no",
+      "yes",
+      "no"
+    ]
+  },
+  {
+    "timestamp": "2025-05-16T17:22:11.038764",
+    "questions": [
+      "How long have you been experiencing dizziness, and is it constant or does it come and go?",
+      "Have you noticed any other symptoms accompanying the dizziness, such as nausea, headache, or changes in vision?",
+      "Have you had any recent changes in your medication or started taking any new supplements?",
+      "Have you experienced any recent injuries or falls that might be related to your dizziness?",
+      "Do you have any history of medical conditions such as vertigo, anemia, or inner ear problems?"
+    ],
+    "answers": [
+      "i feel dizzy",
+      "headache",
+      "yes",
+      "yes",
+      "no"
+    ]
+  },
+  {
+    "timestamp": "2025-05-16T17:45:16.336214",
+    "questions": [
+      "Have you experienced any recent changes in your diet or fluid intake that might be contributing to your dizziness?",
+      "Are you currently taking any medications or supplements that could potentially cause dizziness as a side effect?",
+      "Have you had any recent injuries or falls that could be related to your dizziness?",
+      "Do you notice any other symptoms accompanying the dizziness, such as nausea, headache, or vision changes?",
+      "Have you experienced dizziness in the past, and if so, how does this episode compare to previous ones?"
+    ],
+    "answers": [
+      "i feel dizzy",
+      "change in vision",
+      "no",
+      "no",
+      "no"
+    ]
+  }
+]
