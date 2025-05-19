@@ -1,0 +1,30 @@
+{
+  "simulated_history": {
+    "patient_id": "P100235",
+    "name": "John Doe",
+    "age": 64,
+    "gender": "Male",
+    "conditions": ["Type 2 Diabetes", "Hypertension", "Chronic Kidney Disease"],
+    "medications": [
+      { "name": "Metformin", "dosage": "500mg", "frequency": "BID" },
+      { "name": "Amlodipine", "dosage": "5mg", "frequency": "OD" },
+      { "name": "Losartan", "dosage": "50mg", "frequency": "OD" }
+    ],
+    "allergies": ["Penicillin"],
+    "last_visit": "2024-12-10",
+    "recent_bp_readings": ["145/92", "148/95", "150/90"],
+    "recent_lab_results": {
+      "HbA1c": "8.1%",
+      "Serum Creatinine": "1.8 mg/dL",
+      "GFR": "52 mL/min",
+      "Fasting Glucose": "160 mg/dL",
+      "Cholesterol": {
+        "LDL": "130 mg/dL",
+        "HDL": "38 mg/dL",
+        "Total": "210 mg/dL"
+      }
+    },
+    "past_surgeries": ["Cataract (Left Eye) - 2022"],
+    "family_history": ["Father - Diabetes", "Mother - Stroke"]
+  }
+}

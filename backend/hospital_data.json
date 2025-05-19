@@ -1,92 +1,89 @@
 {
-    "places": {
-      "New York": {
-        "City Hospital": {
-          "Cardiology": {
-            "Dr. Smith": ["9:00 AM", "11:00 AM", "3:00 PM"],
-            "Dr. Lee": ["10:00 AM", "2:00 PM"]
-          },
-          "Neurology": {
-            "Dr. Grey": ["10:00 AM", "2:00 PM"],
-            "Dr. Watson": ["8:30 AM", "1:30 PM"]
-          }
-        },
-        "Downtown Clinic": {
-          "Dermatology": {
-            "Dr. Ray": ["12:00 PM", "4:00 PM"],
-            "Dr. Taylor": ["9:30 AM", "3:00 PM"]
-          },
-          "Orthopedics": {
-            "Dr. Jones": ["11:00 AM", "2:30 PM"]
-          }
-        }
+  "Thiruvananthapuram": {
+    "Sree Chitra Hospital": {
+      "Cardiology": {
+        "Dr. Nair": ["9:00 AM", "11:00 AM", "3:00 PM"],
+        "Dr. Menon": ["10:00 AM", "2:00 PM"]
       },
-      "Chicago": {
-        "Lakeside Medical": {
-          "Orthopedics": {
-            "Dr. Kent": ["10:30 AM", "1:30 PM"],
-            "Dr. Harris": ["9:00 AM", "3:30 PM"]
-          }
-        },
-        "Union Health": {
-          "Cardiology": {
-            "Dr. Grant": ["8:00 AM", "12:00 PM", "4:00 PM"]
-          }
-        }
+      "Neurology": {
+        "Dr. Pillai": ["10:00 AM", "2:00 PM"],
+        "Dr. Kumar": ["8:30 AM", "1:30 PM"]
+      }
+    },
+    "Ananthapuri Clinic": {
+      "Dermatology": {
+        "Dr. Lekshmi": ["12:00 PM", "4:00 PM"],
+        "Dr. Thomas": ["9:30 AM", "3:00 PM"]
       },
-      "Los Angeles": {
-        "Sunset Hospital": {
-          "Dermatology": {
-            "Dr. Black": ["9:00 AM", "1:00 PM", "5:00 PM"]
-          },
-          "Pediatrics": {
-            "Dr. Davis": ["10:00 AM", "2:00 PM"]
-          }
-        },
-        "Skyline Medical": {
-          "Neurology": {
-            "Dr. Hill": ["9:30 AM", "3:30 PM"],
-            "Dr. Green": ["8:00 AM", "12:00 PM"]
-          }
-        }
+      "Orthopedics": {
+        "Dr. George": ["11:00 AM", "2:30 PM"]
+      }
+    }
+  },
+  "Kochi": {
+    "Amrita Institute": {
+      "Orthopedics": {
+        "Dr. Ramesh": ["10:30 AM", "1:30 PM"],
+        "Dr. Rajan": ["9:00 AM", "3:30 PM"]
+      }
+    },
+    "Lakeshore Hospital": {
+      "Cardiology": {
+        "Dr. Balan": ["8:00 AM", "12:00 PM", "4:00 PM"]
+      }
+    }
+  },
+  "Kozhikode": {
+    "Baby Memorial Hospital": {
+      "Dermatology": {
+        "Dr. Mary": ["9:00 AM", "1:00 PM", "5:00 PM"]
       },
-      "San Francisco": {
-        "Bay Area Hospital": {
-          "Orthopedics": {
-            "Dr. Clark": ["10:00 AM", "2:00 PM", "4:30 PM"]
-          },
-          "Dermatology": {
-            "Dr. Smith": ["9:30 AM", "1:30 PM"]
-          }
-        },
-        "Golden Gate Clinic": {
-          "Cardiology": {
-            "Dr. Morgan": ["9:00 AM", "3:00 PM"]
-          },
-          "Gastroenterology": {
-            "Dr. Harris": ["11:00 AM", "2:30 PM"]
-          }
-        }
+      "Pediatrics": {
+        "Dr. Asha": ["10:00 AM", "2:00 PM"]
+      }
+    },
+    "Beachside Medical": {
+      "Neurology": {
+        "Dr. Vinod": ["9:30 AM", "3:30 PM"],
+        "Dr. Fathima": ["8:00 AM", "12:00 PM"]
+      }
+    }
+  },
+  "Thrissur": {
+    "Jubilee Mission Hospital": {
+      "Orthopedics": {
+        "Dr. Abraham": ["10:00 AM", "2:00 PM", "4:30 PM"]
       },
-      "Miami": {
-        "Oceanic Medical Center": {
-          "Neurology": {
-            "Dr. Young": ["8:30 AM", "2:00 PM"],
-            "Dr. White": ["10:00 AM", "4:30 PM"]
-          },
-          "Cardiology": {
-            "Dr. Black": ["9:30 AM", "12:30 PM"]
-          }
-        },
-        "Sunshine Health": {
-          "Orthopedics": {
-            "Dr. Lopez": ["10:00 AM", "1:30 PM"]
-          },
-          "Pediatrics": {
-            "Dr. Oliver": ["9:00 AM", "3:00 PM"]
-          }
-        }
+      "Dermatology": {
+        "Dr. Reena": ["9:30 AM", "1:30 PM"]
+      }
+    },
+    "Elite Hospital": {
+      "Cardiology": {
+        "Dr. Joseph": ["9:00 AM", "3:00 PM"]
+      },
+      "Gastroenterology": {
+        "Dr. Meera": ["11:00 AM", "2:30 PM"]
+      }
+    }
+  },
+  "Kannur": {
+    "AKG Memorial Hospital": {
+      "Neurology": {
+        "Dr. Anwar": ["8:30 AM", "2:00 PM"],
+        "Dr. Suresh": ["10:00 AM", "4:30 PM"]
+      },
+      "Cardiology": {
+        "Dr. Varma": ["9:30 AM", "12:30 PM"]
+      }
+    },
+    "Sunrise Health Center": {
+      "Orthopedics": {
+        "Dr. Devi": ["10:00 AM", "1:30 PM"]
+      },
+      "Pediatrics": {
+        "Dr. Ajith": ["9:00 AM", "3:00 PM"]
       }
     }
   }
-  
+}

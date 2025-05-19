@@ -1,9 +1,13 @@
 store,location,medicine,price,description
 HealthPlus Pharmacy,Downtown,Ibuprofen,$8,Reduces inflammation and pain.
 HealthPlus Pharmacy,Downtown,Amoxicillin,$10,Antibiotic for bacterial infections.
+HealthPlus Pharmacy,Downtown,Metformin,$9,Helps control blood sugar levels in type 2 diabetes.
 City Medico,Suburb,Cough Syrup,$6,Relieves dry cough.
 City Medico,Suburb,Vitamin D,$12,Boosts bone health and immunity.
 City Medico,Suburb,Paracetamol,$5,Used to treat fever and mild pain.
+City Medico,Suburb,Metformin,$9,Helps control blood sugar levels in type 2 diabetes.
 GreenLife Drugs,Uptown,Antacid,$4,Neutralizes stomach acid.
 GreenLife Drugs,Uptown,Paracetamol,$10,Used to treat fever and mild pain.
 GreenLife Drugs,Uptown,Pain Balm,$3,Topical relief for muscle pain.
+GreenLife Drugs,Uptown,Metformin,$8.5,Helps manage type 2 diabetes by reducing glucose production.
+
